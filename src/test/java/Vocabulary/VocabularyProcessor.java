@@ -18,7 +18,9 @@ import java.util.List;
 
 public class VocabularyProcessor {
 
-    private static final String FILE_PATH = "Vocabulary.xlsx";
+   
+    private static final String FILE_PATH = System.getenv("WORKSPACE") + "/Vocabulary.xlsx";
+
 
     // Class to store word and meaning
     public static class Vocabulary {
