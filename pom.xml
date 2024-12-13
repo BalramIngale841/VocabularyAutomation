@@ -57,6 +57,16 @@
                     <target>8</target>
                 </configuration>
             </plugin>
+                <!-- Maven Exec Plugin to Run Main Class -->
+              <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+                <mainClass>Vocabulary.VocabularyAutomation</mainClass>
+                <classpathScope>test</classpathScope>
+            </configuration>
+        </plugin>
         </plugins>
     </build>
 </project>
