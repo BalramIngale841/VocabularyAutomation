@@ -18,8 +18,8 @@ import java.util.List;
 
 public class VocabularyProcessor {
 
-   
-    private static final String FILE_PATH = System.getenv("WORKSPACE") + "/Vocabulary.xlsx";
+    private static final String FILE_PATH = "Vocabulary.xlsx";
+    //private static final String FILE_PATH = System.getenv("WORKSPACE") + "/Vocabulary.xlsx";
 
 
     // Class to store word and meaning
@@ -72,28 +72,53 @@ public class VocabularyProcessor {
     }
 
     // Method to update processed status in Excel
+	/*
+	 * public void markAsProcessed(List<Vocabulary> processedWords) throws Exception
+	 * { FileInputStream fis = new FileInputStream(FILE_PATH); Workbook workbook =
+	 * new XSSFWorkbook(fis); Sheet sheet = workbook.getSheetAt(0);
+	 * 
+	 * for (Row row : sheet) { String word = row.getCell(0).getStringCellValue(); //
+	 * Word column for (Vocabulary vocab : processedWords) { if
+	 * (vocab.getWord().equals(word)) { Cell statusCell = row.createCell(2,
+	 * CellType.STRING); statusCell.setCellValue("Processed"); } } }
+	 * 
+	 * fis.close();
+	 * 
+	 * FileOutputStream fos = new FileOutputStream(FILE_PATH); workbook.write(fos);
+	 * fos.close(); workbook.close(); }
+	 */
+    
+    
     public void markAsProcessed(List<Vocabulary> processedWords) throws Exception {
-        FileInputStream fis = new FileInputStream(FILE_PATH);
-        Workbook workbook = new XSSFWorkbook(fis);
-        Sheet sheet = workbook.getSheetAt(0);
+        // Open the file
+        try (FileInputStream fis = new FileInputStream(FILE_PATH);
+             Workbook workbook = new XSSFWorkbook(fis)) {
 
-        for (Row row : sheet) {
-            String word = row.getCell(0).getStringCellValue(); // Word column
-            for (Vocabulary vocab : processedWords) {
-                if (vocab.getWord().equals(word)) {
-                    Cell statusCell = row.createCell(2, CellType.STRING);
-                    statusCell.setCellValue("Processed");
+            // Access the first sheet
+            Sheet sheet = workbook.getSheetAt(0);
+
+            for (Row row : sheet) {
+                // Get the word from the Word column
+                String word = row.getCell(0).getStringCellValue();
+                for (Vocabulary vocab : processedWords) {
+                    if (vocab.getWord().equals(word)) {
+                        // Check if the Status cell already exists
+                        Cell statusCell = row.getCell(2);
+                        if (statusCell == null) {
+                            // Create a new cell if it doesn't exist
+                            statusCell = row.createCell(2, CellType.STRING);
+                        }
+                        // Update the status to "Processed"
+                        statusCell.setCellValue("Processed");
+                    }
                 }
             }
+
+            // Write the changes back to the file
+            try (FileOutputStream fos = new FileOutputStream(FILE_PATH)) {
+                workbook.write(fos);
+            }
         }
-
-        fis.close();
-
-        FileOutputStream fos = new FileOutputStream(FILE_PATH);
-        workbook.write(fos);
-        fos.close();
-        workbook.close();
     }
 
-    
 }

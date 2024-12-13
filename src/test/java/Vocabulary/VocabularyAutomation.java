@@ -4,6 +4,9 @@ import java.util.List;
 
 public class VocabularyAutomation {
     public static void main(String[] args) {
+    	
+    	
+
         try {
             VocabularyProcessor processor = new VocabularyProcessor();
             List<VocabularyProcessor.Vocabulary> unprocessedWords = processor.getUnprocessedWords(5);
@@ -32,6 +35,9 @@ public class VocabularyAutomation {
             e.printStackTrace();
         }
     }
+    
+    
+
 
 
 }
