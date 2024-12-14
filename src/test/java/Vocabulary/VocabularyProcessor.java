@@ -90,35 +90,35 @@ public class VocabularyProcessor {
     
     
     public void markAsProcessed(List<Vocabulary> processedWords) throws Exception {
-        // Open the file
         try (FileInputStream fis = new FileInputStream(FILE_PATH);
              Workbook workbook = new XSSFWorkbook(fis)) {
 
-            // Access the first sheet
             Sheet sheet = workbook.getSheetAt(0);
 
+            // Iterate through rows to find the words
             for (Row row : sheet) {
-                // Get the word from the Word column
-                String word = row.getCell(0).getStringCellValue();
-                for (Vocabulary vocab : processedWords) {
-                    if (vocab.getWord().equals(word)) {
-                        // Check if the Status cell already exists
-                        Cell statusCell = row.getCell(2);
-                        if (statusCell == null) {
-                            // Create a new cell if it doesn't exist
-                            statusCell = row.createCell(2, CellType.STRING);
+                Cell wordCell = row.getCell(0);
+                Cell statusCell = row.getCell(2);
+
+                if (wordCell != null && statusCell == null) {
+                    String word = wordCell.getStringCellValue();
+
+                    for (Vocabulary vocab : processedWords) {
+                        if (vocab.getWord().equals(word)) {
+                            if (statusCell == null) {
+                                statusCell = row.createCell(2, CellType.STRING);
+                            }
+                            statusCell.setCellValue("Processed");
                         }
-                        // Update the status to "Processed"
-                        statusCell.setCellValue("Processed");
                     }
                 }
             }
 
-            // Write the changes back to the file
             try (FileOutputStream fos = new FileOutputStream(FILE_PATH)) {
                 workbook.write(fos);
             }
         }
     }
+
 
 }
