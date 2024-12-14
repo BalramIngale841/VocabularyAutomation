@@ -47,29 +47,49 @@ public class VocabularyProcessor {
     }
 
     // Method to fetch next batch of unprocessed words
+	/*
+	 * public List<Vocabulary> getUnprocessedWords(int batchSize) throws Exception {
+	 * FileInputStream fis = new FileInputStream(FILE_PATH); Workbook workbook = new
+	 * XSSFWorkbook(fis); Sheet sheet = workbook.getSheetAt(0);
+	 * 
+	 * List<Vocabulary> vocabList = new ArrayList<>(); int count = 0;
+	 * 
+	 * for (Row row : sheet) { Cell statusCell = row.getCell(2); // Status column if
+	 * (statusCell == null || statusCell.getStringCellValue().isEmpty()) { String
+	 * word = row.getCell(0).getStringCellValue(); // Word column String meaning =
+	 * row.getCell(1).getStringCellValue(); // Meaning column vocabList.add(new
+	 * Vocabulary(word, meaning)); count++; if (count == batchSize) break; // Stop
+	 * after batchSize words } } workbook.close(); fis.close();
+	 * 
+	 * return vocabList; }
+	 */
+    
     public List<Vocabulary> getUnprocessedWords(int batchSize) throws Exception {
-        FileInputStream fis = new FileInputStream(FILE_PATH);
-        Workbook workbook = new XSSFWorkbook(fis);
-        Sheet sheet = workbook.getSheetAt(0);
-
         List<Vocabulary> vocabList = new ArrayList<>();
-        int count = 0;
 
-        for (Row row : sheet) {
-            Cell statusCell = row.getCell(2); // Status column
-            if (statusCell == null || statusCell.getStringCellValue().isEmpty()) {
-                String word = row.getCell(0).getStringCellValue(); // Word column
-                String meaning = row.getCell(1).getStringCellValue(); // Meaning column
-                vocabList.add(new Vocabulary(word, meaning));
-                count++;
-                if (count == batchSize) break; // Stop after batchSize words
+        try (FileInputStream fis = new FileInputStream(FILE_PATH);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+
+            Sheet sheet = workbook.getSheetAt(0);
+
+            int count = 0;
+            for (Row row : sheet) {
+                if (count >= batchSize) break;
+
+                Cell statusCell = row.getCell(2);
+                if (statusCell == null || !statusCell.getStringCellValue().equals("Processed")) {
+                    String word = row.getCell(0).getStringCellValue();
+                    String meaning = row.getCell(1).getStringCellValue();
+
+                    vocabList.add(new Vocabulary(word, meaning));
+                    count++;
+                }
             }
         }
-        workbook.close();
-        fis.close();
 
         return vocabList;
     }
+
 
     // Method to update processed status in Excel
 	/*
@@ -95,21 +115,15 @@ public class VocabularyProcessor {
 
             Sheet sheet = workbook.getSheetAt(0);
 
-            // Iterate through rows to find the words
             for (Row row : sheet) {
-                Cell wordCell = row.getCell(0);
-                Cell statusCell = row.getCell(2);
-
-                if (wordCell != null && statusCell == null) {
-                    String word = wordCell.getStringCellValue();
-
-                    for (Vocabulary vocab : processedWords) {
-                        if (vocab.getWord().equals(word)) {
-                            if (statusCell == null) {
-                                statusCell = row.createCell(2, CellType.STRING);
-                            }
-                            statusCell.setCellValue("Processed");
+                String word = row.getCell(0).getStringCellValue();
+                for (Vocabulary vocab : processedWords) {
+                    if (vocab.getWord().equals(word)) {
+                        Cell statusCell = row.getCell(2);
+                        if (statusCell == null) {
+                            statusCell = row.createCell(2, CellType.STRING);
                         }
+                        statusCell.setCellValue("Processed");
                     }
                 }
             }
@@ -119,6 +133,7 @@ public class VocabularyProcessor {
             }
         }
     }
+
 
 
 }
