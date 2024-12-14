@@ -63,8 +63,9 @@
             <artifactId>exec-maven-plugin</artifactId>
             <version>3.0.0</version>
             <configuration>
-                <mainClass>Vocabulary.VocabularyAutomation</mainClass>
+                <mainClass>Vocabulary.VocabularyAutomation</mainClass> 
                 <classpathScope>test</classpathScope>
+                 <logFile>${project.build.directory}/build.log</logFile>
             </configuration>
         </plugin>
         </plugins>
